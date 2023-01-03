@@ -66,7 +66,7 @@ Dest	equ	038h
 NMB	equ	10h	
 
 	di
-	lxi	h,Source
+	lxi	h,Source	; copy a code block to RTS 38.  The vector will hit there.
 	lxi	d,Dest
 	mvi	b,Size
 ILoop	mov	a,m
@@ -89,20 +89,20 @@ ILoop	mov	a,m
 	LXI	H,SIGNON$MSG	;POINT TO IT
 	JMP	?PMSG		;AND PRINT IT
 ; interrupt stuff.
-RTC	lda	curlev
+RTC	lda	curlev		; Here to service Interupt Level 7.
 	push	psw
 	mvi	a,8h
 	sta	curlev
 	ori	0d8h
 	out	254
-	db	21h,10h,00
+	db	21h,10h,00	; this requires a z80 to work
 ;	lxi	h,NMB
-	call	inc32hl
+	call	inc32hl		; count interupt ticks
 	lda	subsec
 	inr	a
 	sta	subsec
 	cpi	10
-	cz	onesec
+	cz	onesec		; 10 ticks per seconds
 ;
 ;  count up clock ticks for one second
 ; interval
@@ -171,7 +171,7 @@ onesec	mvi	a,0
 curlev	ds	1
 subsec	ds	1
 
-Source	push	h
+Source	push	h		; This is the RST 38 code.
 	push	d
 	push	b
 	push	psw
